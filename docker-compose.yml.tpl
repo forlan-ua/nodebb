@@ -20,7 +20,7 @@ services:
     build: .
     command: node /nodebb/app.js
     ports:
-      - "4567:<EXPOSEPORT>"
+      - "<EXPOSEPORT>:4567"
     depends_on:
       - <DATABASE>
     links:
