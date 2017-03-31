@@ -9,7 +9,7 @@ services:
     links:
       - nodebb-web
     volumes:
-      - "${NODEBB_CUSTOM_STATIC}:/custom-static"
+      - "./data/custom-static:/custom-static"
       - "./nginx:/etc/nginx/conf.d"
 
   mongo-setup:
@@ -53,8 +53,8 @@ services:
       - NODEBB_ADMIN_USERNAME=${NODEBB_ADMIN_USERNAME}
       - NODEBB_ADMIN_PASSWORD=${NODEBB_ADMIN_PASSWORD}
     volumes:
-      - "${NODEBB_PLUGINS}:/nodebb/plugins"
-      - "${NODEBB_THEMES}:/nodebb/themes"
+      - "./data/plugins:/nodebb/plugins"
+      - "./data/themes:/nodebb/themes"
       - "./data/nodebb:/nodebb/core"
 
   nodebb-setup:
