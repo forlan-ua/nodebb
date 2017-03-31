@@ -24,7 +24,8 @@ services:
     command: --auth
 
   redis-setup:
-    build: ./redis
+    image: redis
+    command: --appendonly yes
     restart: "no"
     volumes:
       - ./data/redis:/data
@@ -32,7 +33,7 @@ services:
   redis:
     extends: redis-setup
     restart: "unless-stopped"
-    command: --requirepass ${NODEBB_REDIS_PASSWORD}
+    command: --appendonly yes --requirepass ${NODEBB_REDIS_PASSWORD}
 
   nodebb:
     build: ./nodebb

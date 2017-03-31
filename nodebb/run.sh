@@ -16,9 +16,6 @@ setup_node_modules() {
 }
 
 setup_with_redis() {
-    apt-get update
-    apt-get install -y redis-tools
-
     ./nodebb setup \
         --database=redis \
         --redis:host=redis \
@@ -28,8 +25,6 @@ setup_with_redis() {
         --url="$NODEBB_URL" \
         --admin:username="$NODEBB_ADMIN_USERNAME" \
         --admin:password="$NODEBB_ADMIN_PASSWORD"
-
-    redis-cli -h redis -a "$NODEBB_REDIS_PASSWORD" save
 }
 
 setup_with_mongo() {
