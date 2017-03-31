@@ -5,7 +5,7 @@ RUN \
     apt-get update \
 
     # Install packages
-    && apt-get install -y imagemagick build-essential wget curl \
+    && apt-get install -y git imagemagick build-essential wget curl \
 
     # Cleanup
     && apt-get -y autoremove \
@@ -15,9 +15,15 @@ RUN \
     && rm -rf /var/tmp/*
 
 
-WORKDIR /nodebb
-VOLUME /nodebb
+RUN mkdir /nodebb
+VOLUME /nodebb/core
+VOLUME /nodebb/plugins
+VOLUME /nodebb/themes
+
+
 EXPOSE 4567
 
 
-CMD [ "node", "app.js" ]
+WORKDIR /nodebb
+COPY run.sh /nodebb/run.sh
+CMD [ "bash", "run.sh" ]

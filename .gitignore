@@ -1,4 +1,3 @@
 .idea
 node_modules
-data
-docker-compose.yml
+data/

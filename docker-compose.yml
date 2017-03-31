@@ -1,0 +1,63 @@
+version: '2'
+
+services:
+  nginx:
+    build: ./nginx
+    ports:
+      - "${NODEBB_EXPOSE_PORT}:80"
+    links:
+      - nodebb-web
+    volumes:
+      - "${NODEBB_CUSTOM_STATIC}:/custom-static"
+      - "./nginx:/etc/nginx/conf.d"
+
+  mongo-setup:
+    image: mongo
+    volumes:
+      - ./data/mongo:/data/db
+
+  mongo:
+    extends: mongo-setup
+    command: --auth
+
+  redis-setup:
+    image: redis
+    volumes:
+      - ./data/redis:/data
+
+  redis:
+    extends: redis-setup
+    command: --requirepass ${NODEBB_REDIS_PASSWORD}
+
+  nodebb:
+    build: ./nodebb
+    command: ./run.sh
+    environment:
+      - NODEBB_URL=${NODEBB_URL}
+      - NODEBB_DATABASE=${NODEBB_DATABASE}
+
+      - NODEBB_REDIS_PASSWORD=${NODEBB_REDIS_PASSWORD}
+      - NODEBB_REDIS_DB=${NODEBB_REDIS_DB}
+      - NODEBB_REDIS_PORT=${NODEBB_REDIS_PORT}
+
+      - NODEBB_MONGO_USER=${NODEBB_MONGO_USER}
+      - NODEBB_MONGO_PORT=${NODEBB_MONGO_PORT}
+      - NODEBB_MONGO_PASSWORD=${NODEBB_MONGO_PASSWORD}
+      - NODEBB_MONGO_DB=${NODEBB_MONGO_DB}
+
+      - NODEBB_ADMIN_USERNAME=${NODEBB_ADMIN_USERNAME}
+      - NODEBB_ADMIN_PASSWORD=${NODEBB_ADMIN_PASSWORD}
+    volumes:
+      - "${NODEBB_PLUGINS}:/nodebb/plugins"
+      - "${NODEBB_THEMES}:/nodebb/themes"
+      - "./data/nodebb:/nodebb/core"
+
+  nodebb-setup:
+    extends: nodebb
+    links:
+      - "${NODEBB_DATABASE}-setup"
+
+  nodebb-web:
+    extends: nodebb
+    links:
+      - ${NODEBB_DATABASE}
