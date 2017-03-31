@@ -24,7 +24,7 @@ services:
     command: --auth
 
   redis-setup:
-    image: redis
+    build: ./redis
     restart: "no"
     volumes:
       - ./data/redis:/data
