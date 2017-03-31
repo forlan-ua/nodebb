@@ -3,6 +3,7 @@ version: '2'
 services:
   nginx:
     build: ./nginx
+    restart: unless-stopped
     ports:
       - "${NODEBB_EXPOSE_PORT}:80"
     links:
@@ -13,20 +14,24 @@ services:
 
   mongo-setup:
     image: mongo
+    restart: no
     volumes:
       - ./data/mongo:/data/db
 
   mongo:
     extends: mongo-setup
+    restart: unless-stopped
     command: --auth
 
   redis-setup:
     image: redis
+    restart: no
     volumes:
       - ./data/redis:/data
 
   redis:
     extends: redis-setup
+    restart: unless-stopped
     command: --requirepass ${NODEBB_REDIS_PASSWORD}
 
   nodebb:
@@ -54,10 +59,12 @@ services:
 
   nodebb-setup:
     extends: nodebb
+    restart: no
     links:
       - "${NODEBB_DATABASE}-setup"
 
   nodebb-web:
     extends: nodebb
+    restart: unless-stopped
     links:
       - ${NODEBB_DATABASE}
