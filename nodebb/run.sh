@@ -4,14 +4,6 @@
 chown -R www-data:www-data /nodebb
 
 
-if [ "$1" = "exit" ]; then
-    exit 0
-elif [ "$1" = "bash" ];then
-    /bin/bash
-    exit 0
-fi
-
-
 install_packages() {
     echo "Install packages"
 }
@@ -24,7 +16,7 @@ install_themes() {
 setup_node_modules() {
     cd /nodebb/core
     sudo -u www-data npm install --production
-    npm install https://github.com/forlan-ua/nodebb-plugin-exit-on-reload.git
+    echo "process.send = process.send || function(data) {winston.warn(data); if (data&&data.action=='restart') {process.exit(1)}};" >> app.js
 }
 
 setup_with_redis() {
@@ -51,6 +43,21 @@ setup_with_mongo() {
         --admin:username="$NODEBB_ADMIN_USERNAME" \
         --admin:password="$NODEBB_ADMIN_PASSWORD"
 }
+
+
+if [ "$1" = "exit" ]; then
+    exit 0
+elif [ "$1" = "bash" ];then
+    /bin/bash
+    exit 0
+elif [ "$1" = "update-nodebb" ];then
+    cd /nodebb/core
+
+    git ckeckout -- app.js
+    git pull
+
+    setup_node_modules
+fi
 
 
 if [ "$NODEBB_DATABASE" = "redis" ]; then
