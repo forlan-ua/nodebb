@@ -4,6 +4,14 @@
 chown -R www-data:www-data /nodebb
 
 
+if [ "$1" = "exit" ]; then
+    exit 0
+elif [ "$1" = "bash" ];then
+    /bin/bash
+    exit 0
+fi
+
+
 install_packages() {
     echo "Install packages"
 }
@@ -15,7 +23,8 @@ install_themes() {
 
 setup_node_modules() {
     cd /nodebb/core
-    exec sudo -u www-data npm install
+    sudo -u www-data npm install --production
+    npm install https://github.com/forlan-ua/nodebb-plugin-exit-on-reload.git
 }
 
 setup_with_redis() {
@@ -84,11 +93,18 @@ elif [ "$NODEBB_DATABASE" = "mongo" ]; then
         apt-get install -y mongodb-clients
 
         mongo "mongo-setup:$NODEBB_MONGO_PORT/$NODEBB_MONGO_DB" --eval "db.createUser({user: '$NODEBB_MONGO_USER', pwd: '$NODEBB_MONGO_PASSWORD', roles: [{role: 'readWrite', db: '$NODEBB_MONGO_DB'}]});"
+        exit 0
     fi
 else
     echo "Unsupported database $NODEBB_DATABASE"
     exit 1
 fi
 
-cd /nodebb/core
-exec sudo -u www-data node app.js
+if [ "$1" = "start" ]; then
+    cd /nodebb/core
+    exec sudo -u www-data node app.js
+    exit 0
+fi
+
+echo "Command $1 not found"
+exit 1

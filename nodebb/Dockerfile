@@ -15,7 +15,7 @@ RUN \
     && rm -rf /var/tmp/*
 
 
-RUN mkdir /nodebb
+RUN mkdir /nodebb && mkdir -p /var/www && chown www-data:www-data /var/www
 VOLUME /nodebb/core
 VOLUME /nodebb/plugins
 VOLUME /nodebb/themes
@@ -26,4 +26,5 @@ EXPOSE 4567
 
 WORKDIR /nodebb
 COPY run.sh /nodebb/run.sh
-CMD [ "bash", "run.sh" ]
+RUN chmod +x /nodebb/run.sh
+ENTRYPOINT ["/nodebb/run.sh"]

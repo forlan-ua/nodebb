@@ -37,7 +37,7 @@ services:
 
   nodebb:
     build: ./nodebb
-    command: ./run.sh
+    command: exit
     environment:
       - NODEBB_URL=${NODEBB_URL}
       - NODEBB_DATABASE=${NODEBB_DATABASE}
@@ -66,6 +66,7 @@ services:
 
   nodebb-web:
     extends: nodebb
+    command: start
     restart: "unless-stopped"
     links:
       - ${NODEBB_DATABASE}
