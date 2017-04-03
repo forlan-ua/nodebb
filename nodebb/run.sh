@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
+chown -R www-data:www-data /nodebb
+
+
 install_packages() {
     echo "Install packages"
 }
@@ -12,11 +15,11 @@ install_themes() {
 
 setup_node_modules() {
     cd /nodebb/core
-    npm install
+    exec sudo -u www-data npm install
 }
 
 setup_with_redis() {
-    ./nodebb setup \
+    exec sudo -u www-data ./nodebb setup \
         --database=redis \
         --redis:host=redis \
         --redis:port=$NODEBB_REDIS_PORT \
@@ -28,7 +31,7 @@ setup_with_redis() {
 }
 
 setup_with_mongo() {
-    ./nodebb setup \
+    exec sudo -u www-data ./nodebb setup \
         --database=mongo \
         --mongo:host=mongo \
         --mongo:port=$NODEBB_MONGO_PORT \
@@ -88,4 +91,4 @@ else
 fi
 
 cd /nodebb/core
-node app.js
+exec sudo -u www-data node app.js

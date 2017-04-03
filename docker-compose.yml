@@ -9,8 +9,8 @@ services:
     links:
       - nodebb-web
     volumes:
-      - "./data/custom-static:/custom-static"
-      - "./nginx:/etc/nginx/conf.d"
+      - "./data/custom-static:/custom-static:ro"
+      - "./nginx:/etc/nginx/conf.d:ro"
 
   mongo-setup:
     image: mongo
