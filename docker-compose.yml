@@ -9,14 +9,14 @@ services:
     links:
       - nodebb-web
     volumes:
-      - "./data/custom-static:/custom-static:ro"
+      - "./.data/custom-static:/custom-static:ro"
       - "./nginx:/etc/nginx/conf.d:ro"
 
   mongo-setup:
     image: mongo
     restart: "no"
     volumes:
-      - ./data/mongo:/data/db
+      - ./.data/mongo:/data/db
 
   mongo:
     extends: mongo-setup
@@ -28,7 +28,7 @@ services:
     command: --appendonly yes
     restart: "no"
     volumes:
-      - ./data/redis:/data
+      - ./.data/redis:/data
 
   redis:
     extends: redis-setup
@@ -54,9 +54,9 @@ services:
       - NODEBB_ADMIN_USERNAME=${NODEBB_ADMIN_USERNAME}
       - NODEBB_ADMIN_PASSWORD=${NODEBB_ADMIN_PASSWORD}
     volumes:
-      - "./data/plugins:/nodebb/plugins"
-      - "./data/themes:/nodebb/themes"
-      - "./data/nodebb:/nodebb/core"
+      - "./.data/plugins:/nodebb/plugins"
+      - "./.data/themes:/nodebb/themes"
+      - "./.data/nodebb:/nodebb/core"
 
   nodebb-setup:
     extends: nodebb

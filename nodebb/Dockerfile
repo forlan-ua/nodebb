@@ -5,7 +5,7 @@ RUN \
     apt-get update \
 
     # Install packages
-    && apt-get install -y sudo git imagemagick build-essential wget curl \
+    && apt-get install -y sudo git imagemagick build-essential wget curl unzip \
 
     # Cleanup
     && apt-get -y autoremove \

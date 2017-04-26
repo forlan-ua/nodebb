@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if [ -z "$NODEBB_DOCKER_COMPOSE_CONFIG" ]; then
-    NODEBB_DOCKER_COMPOSE_CONFIG="-f ./docker-compose.yml"
+    NODEBB_DOCKER_COMPOSE_CONFIG="-f docker-compose.yml"
 fi
 
 if [ -z "$NODEBB_CORE_DIR" ]; then
-    NODEBB_CORE_DIR="data/nodebb"
+    NODEBB_CORE_DIR=".data/nodebb"
 fi
 
 git clone https://github.com/NodeBB/NodeBB.git $NODEBB_CORE_DIR
