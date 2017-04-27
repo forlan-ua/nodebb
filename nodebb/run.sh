@@ -5,36 +5,35 @@ chown -R www-data:www-data /nodebb
 
 
 install_plugins() {
-    cd /nodebb/core && \
-        sudo -u www-data find /nodebb/plugins -maxdepth 1 -mindepth 1 -type d -exec npm install {} \;
+    sudo -u www-data \
+        find /nodebb/plugins \
+            -maxdepth 1 \
+            -mindepth 1 \
+            -type d \
+            -exec sh -c 'cd /nodebb/core && rm -rf /nodebb/core/node_modules/$(basename {}) && npm install {} && ./nodebb activate $(basename {})' \;
 }
 
-
 install_themes() {
-    cd /nodebb/core && \
-        sudo -u www-data find /nodebb/themes -maxdepth 1 -mindepth 1 -type d -exec npm install {} \;
+    sudo -u www-data \
+        find /nodebb/themes \
+            -maxdepth 1 \
+            -mindepth 1 \
+            -type d \
+            -exec sh -c 'cd /nodebb/core && rm -rf /nodebb/core/node_modules/$(basename {}) && npm install {} && ./nodebb activate $(basename {})' \;
 }
 
 setup_node_modules() {
     cd /nodebb/core && \
-        sudo -u www-data npm install --production && \
-        sudo -u www-data npm install \
-            nodebb-plugin-composer-default \
-            nodebb-plugin-markdown \
-            nodebb-plugin-mentions \
-            nodebb-widget-essentials \
-            nodebb-rewards-essentials \
-            nodebb-plugin-soundpack-default \
-            nodebb-plugin-emoji \
-            nodebb-plugin-emoji-one \
-            nodebb-plugin-emoji-extended \
-            nodebb-plugin-sso-facebook
-    echo "process.send = process.send || function(data) {winston.warn(data); if (data&&data.action=='restart') {process.exit(1)}};" >> app.js
+        sudo -u www-data npm install --production
+    if [ -z $(cat /nodebb/core/app.js | grep PATCHED) ]; then
+        echo "// PATCHED" >> /nodebb/core/app.js
+        echo "process.send = process.send || function(data) {winston.warn(data); if (data&&data.action=='restart') {process.exit(1)}};" >> /nodebb/core/app.js
+    fi
 }
 
 setup_with_redis() {
-    cd /nodebb/core &&
-        exec sudo -u www-data ./nodebb setup \
+    cd /nodebb/core && \
+        sudo -u www-data ./nodebb setup \
             --database=redis \
             --redis:host=redis \
             --redis:port=$NODEBB_REDIS_PORT \
@@ -47,7 +46,7 @@ setup_with_redis() {
 
 setup_with_mongo() {
     cd /nodebb/core && \
-        exec sudo -u www-data ./nodebb setup \
+        sudo -u www-data ./nodebb setup \
             --database=mongo \
             --mongo:host=mongo \
             --mongo:port=$NODEBB_MONGO_PORT \
@@ -74,11 +73,19 @@ elif [ "$1" = "update-nodebb" ];then
     setup_node_modules
     install_plugins
     install_themes
-    node /nodebb/core/nodebb build
+    node /nodebb/core/nodebb upgrade
     exit 0
 elif [ "$1" = "install-plugins" ]; then
     install_plugins
+    exit 0
+elif [ "$1" = "install-themes" ]; then
+    install_themes
+    exit 0
+elif [ "$1" = "build" ]; then
     node /nodebb/core/nodebb build
+    exit 0
+elif [ "$1" = "upgrade" ]; then
+    node /nodebb/core/nodebb upgrade
     exit 0
 fi
 
@@ -92,9 +99,9 @@ if [ "$NODEBB_DATABASE" = "redis" ]; then
         sleep 10;
 
         setup_node_modules
+        setup_with_redis
         install_plugins
         install_themes
-        setup_with_redis
 
         exit 0
     elif [ "$1" = "pre-setup" ]; then
@@ -114,9 +121,9 @@ elif [ "$NODEBB_DATABASE" = "mongo" ]; then
         sleep 10;
 
         setup_node_modules
+        setup_with_mongo
         install_plugins
         install_themes
-        setup_with_mongo
 
         exit 0
     elif [ "$1" = "pre-setup" ]; then
